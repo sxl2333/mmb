@@ -145,5 +145,6 @@ $(document).ready(function() {
 @import url("./assets/lib/css/style.css");
 #menu2{
     background-image: none;
+    
 }
 </style>
