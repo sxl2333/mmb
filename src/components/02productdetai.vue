@@ -43,7 +43,7 @@
                                         <dt>购买数量</dt>
                                         <dd>
                                             <div class="stock-box">
-                                                <el-input-number v-model="num1" @change="handleChange" :min="0" :max="goodsinfo.stock_quantity" label="描述文字"></el-input-number>
+                                                <el-input-number v-model="productNum" @change="handleChange" :min="0" :max="goodsinfo.stock_quantity" label="描述文字"></el-input-number>
                                             </div>
                                             <span class="stock-txt">
                                                 库存
@@ -146,7 +146,7 @@
             </div>
         </div>
         <BackTop></BackTop>
-        <img v-if="imglist.length!=0" :src="imglist[0].original_path" class="imgJump" alt="">
+        <img v-if="imglist.length!=0" :src="imglist[0].original_path" class="moveImg" alt="">
     </div>
 </template>
 <script>
@@ -156,11 +156,11 @@ export default {
   data: function() {
     return {
       productId: "",
-      goodsinfo: {},
-      hotgoodslist: [],
-      imglist: [],
+      goodsinfo: {},//商品信息
+      hotgoodslist: [],//推荐商品
+      imglist: [],//商品内容的图片列表
       //购买数量
-      num1: 0,
+      productNum: 0,
       //商品和评价的点击切换
       showDiscuss: true,
       //放大镜
@@ -191,6 +191,7 @@ export default {
   methods: {
     //商品详情页面
     getproductdetail() {
+        this. productNum=0
       this.productId = this.$route.params.id;
      // console.log(this.productId)
       this.$axios
@@ -260,12 +261,24 @@ export default {
     //点击加入购物车
     AddCar(){
         //获取添加购物车的位置
-        let carOffset=$(".add").offset()
+        if(!this.productNum){
+            this.$Message.error("请选择购买数量")
+            return
+        }
+        let cartOffset=$(".add").offset()
         //获取购物车的位置
-        let buy=$(".icon-cart").offset()
-      console.log(buy)
+        let targetOffset=$(".icon-cart").offset()
+          $(".moveImg").stop().show().addClass('move').css(cartOffset).animate(targetOffset,1000,function(){
+          $(this).hide().removeClass('move')
+          })
 
-        let a=  $(".imgJump").css(carOffset).show().addClass("img ").addClass("imgs").css(buy)
+         //购物车数据变化
+         this.$store.commit("addGoods",{
+             productId:this.productId,
+             productNum:this.productNum
+         })
+        
+    
     }
   },
   watch: {
@@ -327,15 +340,18 @@ export default {
     position: absolute;
     top:0;
     left:0;
-    opacity: 0;
+  
 }
-.imgJump.img{
-    opacity: 1;
-    transition: all 1s;
-    transform: scale(1) rotate(0);
-    // display: block;
+.moveImg {
+  position: absolute;
+  width: 50px;
+  display: none;
+//   top:0;
+//   left:0;
 }
-.imgJump.img.imgs{
-    transform: scale(0) rotate(360deg)
+.moveImg.move{
+    transition:transform  1s,opacity 1s;
+    opacity: .5;
+    transform:scale(.2) rotate(7200deg);
 }
 </style>
