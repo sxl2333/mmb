@@ -43,7 +43,7 @@
                                         <dt>购买数量</dt>
                                         <dd>
                                             <div class="stock-box">
-                                                <el-input-number v-model="productNum" @change="handleChange" :min="0" :max="goodsinfo.stock_quantity" label="描述文字"></el-input-number>
+                                                <el-input-number v-model="productNum"  :min="0" :max="goodsinfo.stock_quantity" label="描述文字"></el-input-number>
                                             </div>
                                             <span class="stock-txt">
                                                 库存
@@ -146,7 +146,7 @@
             </div>
         </div>
         <BackTop></BackTop>
-        <img v-if="imglist.length!=0" :src="imglist[0].original_path" class="moveImg" alt="">
+        <img v-if="imglist.length!=0"  class="moveImg" style="display:none" :src="imglist[0].original_path"  alt="">
     </div>
 </template>
 <script>
@@ -335,23 +335,17 @@ export default {
   justify-content: center;
 }
 //点击购物车,显示图片的样式
-.imgJump{
-    width: 50px;
-    position: absolute;
-    top:0;
-    left:0;
-  
-}
+// 移动图片的样式
 .moveImg {
   position: absolute;
   width: 50px;
-  display: none;
-//   top:0;
-//   left:0;
+  //   display: none;
+  // top:0;
+  // left:0;
 }
-.moveImg.move{
-    transition:transform  1s,opacity 1s;
-    opacity: .5;
-    transform:scale(.2) rotate(7200deg);
+.moveImg.move {
+  transition: transform 1s, opacity 1s;
+  opacity: 0.5;
+  transform: scale(0.2) rotate(7200deg);
 }
 </style>

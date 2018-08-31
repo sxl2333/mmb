@@ -3,6 +3,9 @@ import Vue from 'vue';
 
 import axios from "axios"
 //让每个页面不用再引入axios ,使用时this.$axios
+// 跨域请求时 是否会携带 凭证(cookie),保持登录必须写这个
+axios.defaults.withCredentials=true;
+
 Vue.prototype.$axios=axios
 //axios的基地址
 axios.defaults.baseURL = 'http://47.106.148.205:8899';
@@ -16,7 +19,12 @@ import Index from "./components/01.index.vue";
 import Detail from "./components/02productdetai.vue"
 //导入03组件页
 import  Cart from "./components/03.shoppingCart.vue"
-
+//导入04组件页
+import Login from "./components/04.login.vue"
+//导入05订单详情页面
+import Oder from "./components/05fillOder.vue"
+//导入05订单生成页面\
+import PayOrder from "./components/06.payOrder.vue"
 
 //移入element这个
 import ElementUI from 'element-ui';
@@ -60,7 +68,10 @@ Vue.use(Vuex)
 //实例化
 const store = new Vuex.Store({
   state: {
-    cartDate:JSON.parse(window.localStorage.getItem("goodsKey"))||{}
+    cartDate:JSON.parse(window.localStorage.getItem("goodsKey"))||{},
+    isLogin:false,//默认没有登录
+    //来时的地址
+    formPath:""
   },
   mutations: {
     addGoods(state,product){//商品的键值对-productId:productNum
@@ -81,6 +92,14 @@ const store = new Vuex.Store({
     //delete 删除对象属性的方法没有用,必须用vue的删除方法
    //delete state.cartDate[productId]
    Vue.delete(state.cartDate,productId)
+  },
+  //切换登录状态
+  changeloginStatus(state,isLogin){
+    state.isLogin=isLogin
+  },
+  //保存来时的路径
+  saveFromPath(state, fromPath){
+    state.fromPath=fromPath
   }
   },
  
@@ -95,7 +114,7 @@ const store = new Vuex.Store({
     }
   }
 })
-
+//在页面刷新或关闭时保存数据到本地
 window.onbeforeunload=function(){
   window.localStorage.setItem("goodsKey",JSON.stringify(store.state.cartDate))
 }
@@ -123,15 +142,57 @@ let routes=[
 {
 path:"/cart",
 component:Cart,
+},
+//登录页面
+{
+  path:"/login",
+  component:Login
+},
+//订单详情页面
+{
+  path:"/oder/:ids",
+  component:Oder,
+},
+{
+  path:"/payOrder/:orderid",
+  component:PayOrder,
 }
 ]
 //实例化路由对象(routes的键是固定的,所以才能快速赋值)
 let router=new  VueRouter({
   routes
 })
+
+//增加导航守卫（路由守卫）
+router.beforeEach((to,from,next)=>{
+  //每次有数据过来,就保存地址
+  //提交载荷,保存数据
+  store.commit("saveFromPath",from.path)
+  //如果访问的页面时oder页面，需要判断登录
+  if(to.path.indexOf('/oder')!=-1){
+    axios.get(`site/account/islogin`).then(response=>{
+      if(response.data.code!="nologin"){
+        next()//如果有登录，继续执行代码
+      }else{
+        next("/login")//如果没有登录，返回登录页面
+      }
+    })
+  }else{//其他不需要判断登录的页面，继续执行自己的代码
+    next()
+  }
+})
+
 //挂载路由
 new Vue({
   render: h => h(App),
   router,//路由
   store,//vuex的数据管理
+  //在高一层的组件中判断登录状态
+  beforeCreate(){
+    axios.get("site/account/islogin").then(response=>{
+      if(response.data.code=="logined"){
+        store.state.isLogin=true
+      }
+    })
+  }
 }).$mount('#app')
