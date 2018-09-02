@@ -43,7 +43,7 @@
                     <!--幻灯片-->
                     <div class="left-705">
                         <el-carousel :interval="5000" arrow="always">
-                            <el-carousel-item v-for="item in sliderlist" :key="item">
+                            <el-carousel-item v-for="item in sliderlist" :key="item.id">
                                <a href="#">
                                     <img :src="item.img_url" alt="" class="bannerImg">
                                </a>
@@ -83,7 +83,7 @@
             <div class="wrapper clearfix">
                 <div class="wrap-box">
                     <ul class="img-list">
-                        <li v-for="itemS in item.datas" :key="itemS">
+                        <li v-for="itemS in item.datas" :key="itemS.id">
                             <router-link :to="'/detail/'+itemS.artID">
                                 <div class="img-box">
                                     <img v-lazy="itemS.img_url">

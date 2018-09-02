@@ -23,12 +23,21 @@ import  Cart from "./components/03.shoppingCart.vue"
 import Login from "./components/04.login.vue"
 //导入05订单详情页面
 import Oder from "./components/05fillOder.vue"
-//导入05订单生成页面\
+//导入06订单生成页面\
 import PayOrder from "./components/06.payOrder.vue"
+//导入07支付成功页面
+import PaySuccess from "./components/07.paySuccess.vue"
+//导入08会员中心页面
+import Members from "./components/08.Members.vue"
+//导入09订单列表页面
+import OrderList from "./components/09.orderList.vue"
+//导入支付订单详情页面
+import OrderDetail from "./components/10.orderdetail.vue"
 
 //移入element这个
 import ElementUI from 'element-ui';
 import "../node_modules/element-ui/lib/theme-chalk/index.css"
+
 
 //引入ivew
 import iView from 'iview';
@@ -40,9 +49,13 @@ import VueLazyload from 'vue-lazyload';
 //转化日期的
 import moment from "moment";
 //全局过滤器
-Vue.filter('capitalize', function (val) {
-
-      return moment(val).format("YYYY年MM月DD日HH点mm分ss秒");
+Vue.filter('capitalize', function (val,formatStr) {
+    if(formatStr==undefined){
+      return moment(val).format("YYYY年MM月DD日HH点");
+    }else{
+      return moment(val).format(formatStr);
+    }
+      
   
 })
 Vue.use(VueLazyload, {
@@ -152,11 +165,42 @@ component:Cart,
 {
   path:"/oder/:ids",
   component:Oder,
+  meta: { requiresAuth: true }
 },
+//订单支付页面
 {
   path:"/payOrder/:orderid",
   component:PayOrder,
+  meta: { requiresAuth: true }
+},
+//订单支付成功
+{
+  path:"/paySuccess/:orderid",
+  component:PaySuccess,
+  meta: { requiresAuth: true }
+},
+//会员中心页面
+{
+  path:"/members",
+  component:Members,
+  meta: { requiresAuth: true }
+  
+},
+//交易订单页面
+{
+  path:"/orderList",
+  component:OrderList,
+  meta: { requiresAuth: true }
+  
+},
+//支付订单详情页面
+{
+  path:"/orderdetail/:id",
+  component:OrderDetail,
+  meta: { requiresAuth: true }
+  
 }
+
 ]
 //实例化路由对象(routes的键是固定的,所以才能快速赋值)
 let router=new  VueRouter({
@@ -169,7 +213,7 @@ router.beforeEach((to,from,next)=>{
   //提交载荷,保存数据
   store.commit("saveFromPath",from.path)
   //如果访问的页面时oder页面，需要判断登录
-  if(to.path.indexOf('/oder')!=-1){
+  if(to.meta.requiresAuth==true){
     axios.get(`site/account/islogin`).then(response=>{
       if(response.data.code!="nologin"){
         next()//如果有登录，继续执行代码

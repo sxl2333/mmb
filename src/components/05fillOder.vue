@@ -298,7 +298,7 @@ export default {
     };
     return {
       //页面商品详情
-      message: "",
+      message: [],
       orderForm: {
         //收获人姓名
         accept_name: "石女士",

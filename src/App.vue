@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div id="box">
         <!-- 头部  -->
         <div class="header">
             <!-- 1.0 导航栏头部 -->
@@ -18,7 +18,7 @@
                             <strong>|</strong>
                         </span>
                         <span v-show="$store.state.isLogin==true">
-                            <a href="" class="">会员中心</a>
+                            <router-link to="/members">会员中心</router-link>
                             <strong>|</strong>
                             <a @click="loginOut">退出</a>
                             <strong>|</strong>
@@ -183,7 +183,7 @@ $(document).ready(function() {
         .stop()
         .animate({ top: "-48px" }, 300); // move up - hide
     }
-  );
+  ); 
 });
 </script>
 
@@ -194,4 +194,5 @@ $(document).ready(function() {
 #menu2 {
   background-image: none;
 }
+
 </style>
